@@ -35,7 +35,10 @@ export default function UsersPage() {
   const [error, setError] = useState('');
 
   // Use environment variable or fallback for development
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5001';
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 
+    (typeof window !== 'undefined' && window.location.origin.includes('localhost') 
+      ? 'http://127.0.0.1:5001' 
+      : '');
 
   // For demo/simplicity, we treat the logged-in Clerk user as Admin
   const isAdmin = true; 

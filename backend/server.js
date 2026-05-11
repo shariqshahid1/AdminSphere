@@ -22,22 +22,55 @@ app.use(cors());
 app.use('/api/auth', auth);
 app.use('/api/users', users);
 
-const PORT = 5001; // Force port 5001 for frontend compatibility
-
-// Connect to database
-mongoose
-  .connect(process.env.MONGODB_URI, {
-    family: 4, // Force IPv4 (127.0.0.1)
-  })
-  .then(() => {
-    console.log('MongoDB Connected...');
-  })
-  .catch((err) => {
-    console.error(`Database Error: ${err.message}`);
-    console.log('Server continuing without database (limited functionality)...');
-  });
-
-// Start server
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running in ${process.env.NODE_ENV} mode on http://127.0.0.1:${PORT}`);
+// Root route for backend health check
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', message: 'Backend is running' });
 });
+
+// Database connection logic for serverless
+let cachedConn = null;
+
+const connectDB = async () => {
+  if (cachedConn) return cachedConn;
+  
+  try {
+    if (!process.env.MONGODB_URI) {
+      console.warn('MONGODB_URI is not defined in environment variables');
+      return null;
+    }
+    
+    cachedConn = await mongoose.connect(process.env.MONGODB_URI, {
+      family: 4, // Force IPv4
+    });
+    console.log('MongoDB Connected...');
+    return cachedConn;
+  } catch (err) {
+    console.error(`Database Error: ${err.message}`);
+    cachedConn = null;
+    throw err;
+  }
+};
+
+// For Vercel, we need to ensure DB is connected for every request
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Database connection failed' });
+  }
+});
+
+const PORT = process.env.PORT || 5001;
+
+// Only listen if not in a serverless environment (like Vercel)
+if (require.main === module) {
+  connectDB().then(() => {
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`Server running on http://127.0.0.1:${PORT}`);
+    });
+  });
+}
+
+// Export the app for Vercel
+module.exports = app;
