@@ -55,7 +55,7 @@ export default function UsersPage() {
       if (response.data && response.data.data) {
         setUsers(response.data.data);
       }
-    } catch (err) {
+    } catch {
       console.warn('Backend not reached, using mock data for demo.');
       // FALLBACK: Mock data so the UI doesn't break
       const mockUsers: User[] = [

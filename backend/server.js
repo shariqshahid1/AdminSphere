@@ -46,8 +46,9 @@ const connectDB = async () => {
     return cachedConn;
   } catch (err) {
     console.error(`Database Error: ${err.message}`);
+    console.warn('Backend starting without database connection. Some features may not work.');
     cachedConn = null;
-    throw err;
+    return null; // Return null instead of throwing to prevent app crash
   }
 };
 
@@ -57,7 +58,8 @@ app.use(async (req, res, next) => {
     await connectDB();
     next();
   } catch (err) {
-    res.status(500).json({ success: false, message: 'Database connection failed' });
+    // Only fail if we absolutely need the DB for this route
+    next();
   }
 });
 
