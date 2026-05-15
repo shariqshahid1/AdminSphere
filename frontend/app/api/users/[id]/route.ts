@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import User from '@/models/User';
 import { auth } from '@clerk/nextjs/server';
+import { protect, authorize } from '@/lib/auth';
 
 // @desc    Get single user
 // @route   GET /api/users/:id
@@ -13,9 +14,15 @@ export async function GET(
     await dbConnect();
     const { id } = await params;
 
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ success: false, message: 'Not authorized' }, { status: 401 });
+    // 1. Try custom JWT auth
+    let userAuth = await protect(req);
+    
+    // 2. Fallback to Clerk auth
+    if (!userAuth) {
+      const { userId } = await auth();
+      if (!userId) {
+        return NextResponse.json({ success: false, message: 'Not authorized' }, { status: 401 });
+      }
     }
 
     const user = await User.findById(id);
@@ -40,9 +47,20 @@ export async function PUT(
     await dbConnect();
     const { id } = await params;
 
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ success: false, message: 'Not authorized' }, { status: 401 });
+    // 1. Try custom JWT auth
+    let userAuth = await protect(req);
+    
+    // 2. Fallback to Clerk auth
+    if (!userAuth) {
+      const { userId } = await auth();
+      if (!userId) {
+        return NextResponse.json({ success: false, message: 'Not authorized' }, { status: 401 });
+      }
+    } else {
+      // If using custom JWT, check for Admin role like in backend
+      if (!authorize('Admin')(userAuth)) {
+        return NextResponse.json({ success: false, message: 'Not authorized for this route' }, { status: 403 });
+      }
     }
 
     const body = await req.json();
@@ -72,9 +90,20 @@ export async function DELETE(
     await dbConnect();
     const { id } = await params;
 
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ success: false, message: 'Not authorized' }, { status: 401 });
+    // 1. Try custom JWT auth
+    let userAuth = await protect(req);
+    
+    // 2. Fallback to Clerk auth
+    if (!userAuth) {
+      const { userId } = await auth();
+      if (!userId) {
+        return NextResponse.json({ success: false, message: 'Not authorized' }, { status: 401 });
+      }
+    } else {
+      // If using custom JWT, check for Admin role like in backend
+      if (!authorize('Admin')(userAuth)) {
+        return NextResponse.json({ success: false, message: 'Not authorized for this route' }, { status: 403 });
+      }
     }
 
     const user = await User.findByIdAndDelete(id);

@@ -1,20 +1,24 @@
-# Full Stack Admin Dashboard
+# Full Stack Admin Dashboard (Next.js Unified)
 
-A robust, responsive admin dashboard built with React (Next.js), Node.js, Express, and MongoDB.
+A robust, responsive admin dashboard built with Next.js, Tailwind CSS, and MongoDB. The backend is fully integrated into Next.js API Route Handlers.
 
 ## Features
-- **Authentication**: JWT-based login and session management.
-- **Role-Based Access**: Different permissions for Admins and Managers.
-- **Dashboard**: Stats cards and interactive charts (Recharts).
-- **User Management**: Full CRUD operations for managing users.
-- **Dark Mode**: Support for light and dark themes with system preference detection.
-- **Responsive Design**: Built with Tailwind CSS for all screen sizes.
+- **Unified Architecture**: Frontend and Backend in a single Next.js project.
+- **Authentication**: Supports both **Clerk** and **Custom JWT** (Register/Login).
+- **Role-Based Access**: Permissions for Admins and Managers.
+- **Dashboard**: Interactive charts (Recharts) and stats.
+- **User Management**: Full CRUD operations.
+- **Dark Mode**: Support for light/dark themes.
 
 ## Project Structure
 ```
 admin-dashboard/
-├── backend/          # Node.js + Express + MongoDB
-└── frontend/         # Next.js + Tailwind CSS + Recharts
+└── frontend/         # Next.js App (Everything)
+    ├── app/api/      # Backend API Routes
+    ├── components/   # UI Components
+    ├── lib/          # Utilities (Auth, DB)
+    ├── models/       # Mongoose Models
+    └── scripts/      # Database Seed Scripts
 ```
 
 ## Setup Instructions
@@ -22,29 +26,9 @@ admin-dashboard/
 ### Prerequisites
 - Node.js (v18+)
 - MongoDB (Local or Atlas)
+- Clerk API Keys (if using Clerk)
 
-### 1. Backend Setup
-1. Navigate to the backend folder:
-   ```bash
-   cd backend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Create a `.env` file in the `backend` directory:
-   ```env
-   PORT=5000
-   MONGODB_URI=mongodb://localhost:27017/admin_dashboard
-   JWT_SECRET=your_jwt_secret_here
-   NODE_ENV=development
-   ```
-4. Start the server:
-   ```bash
-   npm start
-   ```
-
-### 2. Frontend Setup
+### Setup
 1. Navigate to the frontend folder:
    ```bash
    cd frontend
@@ -53,25 +37,26 @@ admin-dashboard/
    ```bash
    npm install
    ```
-3. Start the development server:
+3. Create a `.env.local` file in the `frontend` directory:
+   ```env
+   MONGODB_URI=mongodb://localhost:27017/admin_dashboard
+   JWT_SECRET=your_jwt_secret_here
+   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=...
+   CLERK_SECRET_KEY=...
+   ```
+4. Seed the database (optional):
+   ```bash
+   node scripts/seed.js
+   ```
+5. Start the development server:
    ```bash
    npm run dev
    ```
-4. Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-## Initial User Creation
-To log in for the first time, you can use a tool like Postman or `curl` to register an admin user:
-
-**POST** `http://localhost:5000/api/auth/register`
-```json
-{
-  "name": "Admin User",
-  "email": "admin@example.com",
-  "password": "password123",
-  "role": "Admin"
-}
-```
+6. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Technologies Used
-- **Frontend**: Next.js, Tailwind CSS, Lucide React, Recharts, Axios, next-themes.
-- **Backend**: Node.js, Express, MongoDB, Mongoose, JWT, Bcrypt.js.
+- **Frontend/Backend**: Next.js 16
+- **Styling**: Tailwind CSS 4
+- **Database**: MongoDB & Mongoose
+- **Auth**: Clerk & Custom JWT (Bcrypt.js)
+- **Icons/Charts**: Lucide React, Recharts

@@ -2,17 +2,24 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import User from '@/models/User';
 import { auth } from '@clerk/nextjs/server';
+import { protect, authorize } from '@/lib/auth';
 
 // @desc    Get all users
 // @route   GET /api/users
-export async function GET() {
+export async function GET(req: Request) {
   try {
     await dbConnect();
     
-    // Check authentication with Clerk
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ success: false, message: 'Not authorized' }, { status: 401 });
+    // 1. Try custom JWT auth
+    let user = await protect(req);
+    
+    // 2. Fallback to Clerk auth
+    if (!user) {
+      const { userId } = await auth();
+      if (!userId) {
+        return NextResponse.json({ success: false, message: 'Not authorized' }, { status: 401 });
+      }
+      // If using Clerk, we assume authorized for GET users
     }
 
     const users = await User.find().sort({ createdAt: -1 });
@@ -29,19 +36,26 @@ export async function POST(req: Request) {
   try {
     await dbConnect();
 
-    // Check authentication and authorization with Clerk
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ success: false, message: 'Not authorized' }, { status: 401 });
+    // 1. Try custom JWT auth
+    let user = await protect(req);
+    
+    // 2. Fallback to Clerk auth
+    if (!user) {
+      const { userId } = await auth();
+      if (!userId) {
+        return NextResponse.json({ success: false, message: 'Not authorized' }, { status: 401 });
+      }
+    } else {
+      // If using custom JWT, check for Admin role like in backend
+      if (!authorize('Admin')(user)) {
+        return NextResponse.json({ success: false, message: 'Not authorized for this route' }, { status: 403 });
+      }
     }
 
-    // In a real app, you'd check for Admin role here
-    // For now, we'll allow any authenticated user to create (matching existing frontend logic)
-
     const body = await req.json();
-    const user = await User.create(body);
+    const newUser = await User.create(body);
     
-    return NextResponse.json({ success: true, data: user }, { status: 201 });
+    return NextResponse.json({ success: true, data: newUser }, { status: 201 });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'An unknown error occurred';
     return NextResponse.json({ success: false, message }, { status: 400 });
