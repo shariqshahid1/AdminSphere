@@ -34,11 +34,8 @@ export default function UsersPage() {
   const [formLoading, setFormLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Use environment variable or fallback for development
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 
-    (typeof window !== 'undefined' && window.location.origin.includes('localhost') 
-      ? 'http://127.0.0.1:5001' 
-      : '');
+  // Use relative path for Next.js API routes
+  const API_BASE_URL = '';
 
   // For demo/simplicity, we treat the logged-in Clerk user as Admin
   const isAdmin = true; 
@@ -46,17 +43,13 @@ export default function UsersPage() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      // Using demo token for backend compatibility
-      const token = 'demo-token-123';
-      const response = await axios.get(`${API_BASE_URL}/api/users`, {
-        headers: { Authorization: `Bearer ${token}` },
-        timeout: 2000 // Short timeout to trigger fallback quickly
-      });
+      // Auth is handled by Clerk cookies automatically
+      const response = await axios.get(`${API_BASE_URL}/api/users`);
       if (response.data && response.data.data) {
         setUsers(response.data.data);
       }
     } catch {
-      console.warn('Backend not reached, using mock data for demo.');
+      console.warn('API not reached, using mock data for demo.');
       // FALLBACK: Mock data so the UI doesn't break
       const mockUsers: User[] = [
         {
@@ -94,7 +87,6 @@ export default function UsersPage() {
     return () => {
       isMounted = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleOpenModal = (user: User | null = null) => {
@@ -109,17 +101,12 @@ export default function UsersPage() {
     setError('');
 
     try {
-      const token = 'demo-token-123';
       if (currentUser?._id) {
         // Update
-        await axios.put(`${API_BASE_URL}/api/users/${currentUser._id}`, currentUser, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        await axios.put(`${API_BASE_URL}/api/users/${currentUser._id}`, currentUser);
       } else {
         // Create
-        await axios.post(`${API_BASE_URL}/api/users`, currentUser, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        await axios.post(`${API_BASE_URL}/api/users`, currentUser);
       }
       setIsModalOpen(false);
       fetchUsers();
@@ -138,10 +125,7 @@ export default function UsersPage() {
     if (!confirm('Are you sure you want to delete this user?')) return;
 
     try {
-      const token = 'demo-token-123';
-      await axios.delete(`${API_BASE_URL}/api/users/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.delete(`${API_BASE_URL}/api/users/${id}`);
       fetchUsers();
     } catch (err) {
       console.error('Failed to delete user', err);
