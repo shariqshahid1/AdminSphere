@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/db';
-import User from '@/models/User';
+import { mockDb } from '@/lib/mock-db';
 import { auth } from '@clerk/nextjs/server';
 import { protect, authorize } from '@/lib/auth';
 
@@ -8,10 +7,8 @@ import { protect, authorize } from '@/lib/auth';
 // @route   GET /api/users
 export async function GET(req: Request) {
   try {
-    await dbConnect();
-    
     // 1. Try custom JWT auth
-    let user = await protect(req);
+    const user = await protect(req);
     
     // 2. Fallback to Clerk auth
     if (!user) {
@@ -22,7 +19,7 @@ export async function GET(req: Request) {
       // If using Clerk, we assume authorized for GET users
     }
 
-    const users = await User.find().sort({ createdAt: -1 });
+    const users = await mockDb.users.find();
     return NextResponse.json({ success: true, count: users.length, data: users });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'An unknown error occurred';
@@ -34,10 +31,8 @@ export async function GET(req: Request) {
 // @route   POST /api/users
 export async function POST(req: Request) {
   try {
-    await dbConnect();
-
     // 1. Try custom JWT auth
-    let user = await protect(req);
+    const user = await protect(req);
     
     // 2. Fallback to Clerk auth
     if (!user) {
@@ -53,7 +48,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const newUser = await User.create(body);
+    const newUser = await mockDb.users.create(body);
     
     return NextResponse.json({ success: true, data: newUser }, { status: 201 });
   } catch (error: unknown) {

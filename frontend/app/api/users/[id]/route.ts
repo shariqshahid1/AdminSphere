@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/db';
-import User from '@/models/User';
+import { mockDb } from '@/lib/mock-db';
 import { auth } from '@clerk/nextjs/server';
 import { protect, authorize } from '@/lib/auth';
 
@@ -11,11 +10,10 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await dbConnect();
     const { id } = await params;
 
     // 1. Try custom JWT auth
-    let userAuth = await protect(req);
+    const userAuth = await protect(req);
     
     // 2. Fallback to Clerk auth
     if (!userAuth) {
@@ -25,7 +23,7 @@ export async function GET(
       }
     }
 
-    const user = await User.findById(id);
+    const user = await mockDb.users.findById(id);
     if (!user) {
       return NextResponse.json({ success: false, message: 'User not found' }, { status: 404 });
     }
@@ -44,11 +42,10 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await dbConnect();
     const { id } = await params;
 
     // 1. Try custom JWT auth
-    let userAuth = await protect(req);
+    const userAuth = await protect(req);
     
     // 2. Fallback to Clerk auth
     if (!userAuth) {
@@ -64,10 +61,7 @@ export async function PUT(
     }
 
     const body = await req.json();
-    const user = await User.findByIdAndUpdate(id, body, {
-      new: true,
-      runValidators: true
-    });
+    const user = await mockDb.users.findByIdAndUpdate(id, body);
 
     if (!user) {
       return NextResponse.json({ success: false, message: 'User not found' }, { status: 404 });
@@ -87,11 +81,10 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await dbConnect();
     const { id } = await params;
 
     // 1. Try custom JWT auth
-    let userAuth = await protect(req);
+    const userAuth = await protect(req);
     
     // 2. Fallback to Clerk auth
     if (!userAuth) {
@@ -106,7 +99,7 @@ export async function DELETE(
       }
     }
 
-    const user = await User.findByIdAndDelete(id);
+    const user = await mockDb.users.findByIdAndDelete(id);
 
     if (!user) {
       return NextResponse.json({ success: false, message: 'User not found' }, { status: 404 });

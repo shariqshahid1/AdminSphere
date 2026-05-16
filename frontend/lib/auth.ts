@@ -1,7 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { NextResponse } from 'next/server';
-import dbConnect from './db';
-import User from '@/models/User';
+import { mockDb } from './mock-db';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'secret';
 
@@ -31,21 +29,20 @@ export async function protect(req: Request) {
 
     const decoded = jwt.verify(token, JWT_SECRET) as { id: string };
     
-    await dbConnect();
-    const user = await User.findById(decoded.id);
+    const user = await mockDb.users.findById(decoded.id);
 
     if (!user) {
       return null;
     }
 
     return user;
-  } catch (err) {
+  } catch (_err) {
     return null;
   }
 }
 
 export function authorize(...roles: string[]) {
-  return (user: any) => {
+  return (user: { role: string } | null) => {
     if (!user || !roles.includes(user.role)) {
       return false;
     }
@@ -53,7 +50,7 @@ export function authorize(...roles: string[]) {
   };
 }
 
-export const sendTokenResponse = (user: any) => {
+export const sendTokenResponse = (user: { _id: string; name: string; email: string; role: string }) => {
   const token = jwt.sign({ id: user._id }, JWT_SECRET, {
     expiresIn: '30d'
   });
