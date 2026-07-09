@@ -5,7 +5,7 @@ A robust, responsive admin dashboard built with Next.js 15+, Tailwind CSS 4, and
 ## Features
 - **Unified Architecture**: Frontend and Backend in a single Next.js project.
 - **Authentication**: Managed exclusively by **Clerk** (Social & Email login).
-- **Middleware Protection**: All routes are protected via Clerk Middleware.
+- **Proxy Protection**: All routes are protected via Clerk Proxy (Middleware).
 - **Dashboard**: Interactive charts (Recharts) and real-time stats.
 - **User Management**: Full CRUD operations for managing team members.
 - **Dark Mode**: Support for light/dark themes using `next-themes`.
