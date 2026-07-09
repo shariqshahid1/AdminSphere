@@ -1,5 +1,7 @@
 # Full Stack Admin Dashboard (Next.js Unified)
 
+**Live Demo:** [https://adminsph.vercel.app](https://adminsph.vercel.app)
+
 A robust, responsive admin dashboard built with Next.js 15+, Tailwind CSS 4, and Clerk Authentication. The backend is fully integrated into Next.js API Route Handlers.
 
 ## Features
