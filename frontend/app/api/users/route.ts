@@ -1,22 +1,15 @@
 import { NextResponse } from 'next/server';
 import { mockDb } from '@/lib/mock-db';
 import { auth } from '@clerk/nextjs/server';
-import { protect, authorize } from '@/lib/auth';
 
 // @desc    Get all users
 // @route   GET /api/users
-export async function GET(req: Request) {
+export async function GET() {
   try {
-    // 1. Try custom JWT auth
-    const user = await protect(req);
+    const { userId } = await auth();
     
-    // 2. Fallback to Clerk auth
-    if (!user) {
-      const { userId } = await auth();
-      if (!userId) {
-        return NextResponse.json({ success: false, message: 'Not authorized' }, { status: 401 });
-      }
-      // If using Clerk, we assume authorized for GET users
+    if (!userId) {
+      return NextResponse.json({ success: false, message: 'Not authorized' }, { status: 401 });
     }
 
     const users = await mockDb.users.find();
@@ -31,20 +24,10 @@ export async function GET(req: Request) {
 // @route   POST /api/users
 export async function POST(req: Request) {
   try {
-    // 1. Try custom JWT auth
-    const user = await protect(req);
+    const { userId } = await auth();
     
-    // 2. Fallback to Clerk auth
-    if (!user) {
-      const { userId } = await auth();
-      if (!userId) {
-        return NextResponse.json({ success: false, message: 'Not authorized' }, { status: 401 });
-      }
-    } else {
-      // If using custom JWT, check for Admin role like in backend
-      if (!authorize('Admin')(user)) {
-        return NextResponse.json({ success: false, message: 'Not authorized for this route' }, { status: 403 });
-      }
+    if (!userId) {
+      return NextResponse.json({ success: false, message: 'Not authorized' }, { status: 401 });
     }
 
     const body = await req.json();

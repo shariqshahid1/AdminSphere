@@ -1,32 +1,31 @@
 # Full Stack Admin Dashboard (Next.js Unified)
 
-A robust, responsive admin dashboard built with Next.js, Tailwind CSS, and MongoDB. The backend is fully integrated into Next.js API Route Handlers.
+A robust, responsive admin dashboard built with Next.js 15+, Tailwind CSS 4, and Clerk Authentication. The backend is fully integrated into Next.js API Route Handlers.
 
 ## Features
 - **Unified Architecture**: Frontend and Backend in a single Next.js project.
-- **Authentication**: Supports both **Clerk** and **Custom JWT** (Register/Login).
-- **Role-Based Access**: Permissions for Admins and Managers.
-- **Dashboard**: Interactive charts (Recharts) and stats.
-- **User Management**: Full CRUD operations.
-- **Dark Mode**: Support for light/dark themes.
+- **Authentication**: Managed exclusively by **Clerk** (Social & Email login).
+- **Middleware Protection**: All routes are protected via Clerk Middleware.
+- **Dashboard**: Interactive charts (Recharts) and real-time stats.
+- **User Management**: Full CRUD operations for managing team members.
+- **Dark Mode**: Support for light/dark themes using `next-themes`.
 
 ## Project Structure
 ```
 admin-dashboard/
-└── frontend/         # Next.js App (Everything)
-    ├── app/api/      # Backend API Routes
-    ├── components/   # UI Components
-    ├── lib/          # Utilities (Auth, DB)
-    ├── models/       # Mongoose Models
-    └── scripts/      # Database Seed Scripts
+└── frontend/         # Next.js App
+    ├── app/          # Next.js App Router (Pages & API)
+    │   └── api/      # Backend API Routes
+    ├── components/   # UI Components (Sidebar, Navbar, etc.)
+    ├── lib/          # Utilities & Mock Database
+    └── public/       # Static Assets
 ```
 
 ## Setup Instructions
 
 ### Prerequisites
 - Node.js (v18+)
-- MongoDB (Local or Atlas)
-- Clerk API Keys (if using Clerk)
+- Clerk API Keys (Publishable Key & Secret Key)
 
 ### Setup
 1. Navigate to the frontend folder:
@@ -39,24 +38,19 @@ admin-dashboard/
    ```
 3. Create a `.env.local` file in the `frontend` directory:
    ```env
-   MONGODB_URI=mongodb://localhost:27017/admin_dashboard
-   JWT_SECRET=your_jwt_secret_here
-   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=...
-   CLERK_SECRET_KEY=...
+   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_publishable_key
+   CLERK_SECRET_KEY=your_secret_key
+   NEXT_PUBLIC_CLERK_SIGN_IN_URL=/login
+   NEXT_PUBLIC_CLERK_SIGN_UP_URL=/signup
    ```
-4. Seed the database (optional):
-   ```bash
-   node scripts/seed.js
-   ```
-5. Start the development server:
+4. Start the development server:
    ```bash
    npm run dev
    ```
-6. Open [http://localhost:3000](http://localhost:3000) in your browser.
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Technologies Used
-- **Frontend/Backend**: Next.js 16
+- **Frontend/Backend**: Next.js 15/16
 - **Styling**: Tailwind CSS 4
-- **Database**: MongoDB & Mongoose
-- **Auth**: Clerk & Custom JWT (Bcrypt.js)
+- **Auth**: Clerk
 - **Icons/Charts**: Lucide React, Recharts

@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { mockDb } from '@/lib/mock-db';
 import { auth } from '@clerk/nextjs/server';
-import { protect, authorize } from '@/lib/auth';
 
 // @desc    Get single user
 // @route   GET /api/users/:id
@@ -11,16 +10,10 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-
-    // 1. Try custom JWT auth
-    const userAuth = await protect(req);
+    const { userId } = await auth();
     
-    // 2. Fallback to Clerk auth
-    if (!userAuth) {
-      const { userId } = await auth();
-      if (!userId) {
-        return NextResponse.json({ success: false, message: 'Not authorized' }, { status: 401 });
-      }
+    if (!userId) {
+      return NextResponse.json({ success: false, message: 'Not authorized' }, { status: 401 });
     }
 
     const user = await mockDb.users.findById(id);
@@ -43,21 +36,10 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-
-    // 1. Try custom JWT auth
-    const userAuth = await protect(req);
+    const { userId } = await auth();
     
-    // 2. Fallback to Clerk auth
-    if (!userAuth) {
-      const { userId } = await auth();
-      if (!userId) {
-        return NextResponse.json({ success: false, message: 'Not authorized' }, { status: 401 });
-      }
-    } else {
-      // If using custom JWT, check for Admin role like in backend
-      if (!authorize('Admin')(userAuth)) {
-        return NextResponse.json({ success: false, message: 'Not authorized for this route' }, { status: 403 });
-      }
+    if (!userId) {
+      return NextResponse.json({ success: false, message: 'Not authorized' }, { status: 401 });
     }
 
     const body = await req.json();
@@ -82,21 +64,10 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-
-    // 1. Try custom JWT auth
-    const userAuth = await protect(req);
+    const { userId } = await auth();
     
-    // 2. Fallback to Clerk auth
-    if (!userAuth) {
-      const { userId } = await auth();
-      if (!userId) {
-        return NextResponse.json({ success: false, message: 'Not authorized' }, { status: 401 });
-      }
-    } else {
-      // If using custom JWT, check for Admin role like in backend
-      if (!authorize('Admin')(userAuth)) {
-        return NextResponse.json({ success: false, message: 'Not authorized for this route' }, { status: 403 });
-      }
+    if (!userId) {
+      return NextResponse.json({ success: false, message: 'Not authorized' }, { status: 401 });
     }
 
     const user = await mockDb.users.findByIdAndDelete(id);
