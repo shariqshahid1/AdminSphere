@@ -2,7 +2,7 @@
 
 **Live Demo:** [https://adminsph.vercel.app](https://adminsph.vercel.app)
 
-A modern admin dashboard built with Next.js, Tailwind CSS, and custom JWT authentication.
+A modern, fully responsive admin dashboard built with Next.js, Tailwind CSS, and custom JWT authentication.
 
 ## Features
 - Sign in / Sign up with email and password (JWT auth)
