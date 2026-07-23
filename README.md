@@ -1,58 +1,59 @@
-# Full Stack Admin Dashboard (Next.js Unified)
+# Admin Dashboard
 
 **Live Demo:** [https://adminsph.vercel.app](https://adminsph.vercel.app)
 
-A robust, responsive admin dashboard built with Next.js 15+, Tailwind CSS 4, and Clerk Authentication. The backend is fully integrated into Next.js API Route Handlers.
+A modern admin dashboard built with Next.js, Tailwind CSS, and custom JWT authentication.
 
 ## Features
-- **Unified Architecture**: Frontend and Backend in a single Next.js project.
-- **Authentication**: Managed exclusively by **Clerk** (Social & Email login).
-- **Proxy Protection**: All routes are protected via Clerk Proxy (Middleware).
-- **Dashboard**: Interactive charts (Recharts) and real-time stats.
-- **User Management**: Full CRUD operations for managing team members.
-- **Dark Mode**: Support for light/dark themes using `next-themes`.
+- Sign in / Sign up with email and password (JWT auth)
+- Role-based access control (Admin, Manager, Editor)
+- User CRUD operations
+- Dark mode support
+- Charts for dashboard analytics
+- Fully responsive design (mobile, tablet, desktop)
+- Settings page with notifications, security, and display options
 
 ## Project Structure
 ```
 admin-dashboard/
-└── frontend/         # Next.js App
-    ├── app/          # Next.js App Router (Pages & API)
-    │   └── api/      # Backend API Routes
-    ├── components/   # UI Components (Sidebar, Navbar, etc.)
-    ├── lib/          # Utilities & Mock Database
-    └── public/       # Static Assets
+└── frontend/
+    ├── app/          # pages + api routes
+    ├── components/   # reusable components
+    ├── lib/          # utils, auth, mock db
+    └── .env.local    # environment variables
 ```
 
-## Setup Instructions
+## Setup
 
-### Prerequisites
-- Node.js (v18+)
-- Clerk API Keys (Publishable Key & Secret Key)
-
-### Setup
-1. Navigate to the frontend folder:
+1. Go to frontend folder
    ```bash
    cd frontend
    ```
-2. Install dependencies:
+
+2. Install dependencies
    ```bash
    npm install
    ```
-3. Create a `.env.local` file in the `frontend` directory:
+
+3. Create `.env.local` in frontend folder:
    ```env
-   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_publishable_key
-   CLERK_SECRET_KEY=your_secret_key
-   NEXT_PUBLIC_CLERK_SIGN_IN_URL=/login
-   NEXT_PUBLIC_CLERK_SIGN_UP_URL=/signup
+   JWT_SECRET=your-super-secret-jwt-key-here
    ```
-4. Start the development server:
+
+4. Run it
    ```bash
    npm run dev
    ```
-5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Technologies Used
-- **Frontend/Backend**: Next.js 15/16
-- **Styling**: Tailwind CSS 4
-- **Auth**: Clerk
-- **Icons/Charts**: Lucide React, Recharts
+5. Open http://localhost:3000
+
+## Demo Credentials
+- **Email:** ahmed@admin.io
+- **Password:** password123
+
+## Tech Stack
+- Next.js 16
+- Tailwind CSS 4
+- JWT auth (jose + bcryptjs)
+- Recharts for charts
+- Lucide for icons

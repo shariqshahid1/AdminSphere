@@ -9,9 +9,7 @@ export default function ThemeToggle() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setMounted(true);
-    }, 0);
+    const timer = setTimeout(() => setMounted(true), 0);
     return () => clearTimeout(timer);
   }, []);
 
@@ -20,13 +18,13 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-      className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-      aria-label="Toggle dark mode"
+      className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/[0.04] transition-all duration-200 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+      aria-label="Toggle theme"
     >
       {theme === 'dark' ? (
-        <Sun className="w-5 h-5 text-yellow-500" />
+        <Sun className="w-[18px] h-[18px]" />
       ) : (
-        <Moon className="w-5 h-5 text-gray-700" />
+        <Moon className="w-[18px] h-[18px]" />
       )}
     </button>
   );

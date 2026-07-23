@@ -1,26 +1,21 @@
 import { NextResponse } from 'next/server';
 import { mockDb } from '@/lib/mock-db';
-import { auth } from '@clerk/nextjs/server';
+import { getUserFromRequest, hashPassword } from '@/lib/auth';
 
-// @desc    Get single user
-// @route   GET /api/users/:id
 export async function GET(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    const { userId } = await auth();
-    
+    const userId = await getUserFromRequest(req);
     if (!userId) {
       return NextResponse.json({ success: false, message: 'Not authorized' }, { status: 401 });
     }
-
     const user = await mockDb.users.findById(id);
     if (!user) {
       return NextResponse.json({ success: false, message: 'User not found' }, { status: 404 });
     }
-
     return NextResponse.json({ success: true, data: user });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'An unknown error occurred';
@@ -28,27 +23,24 @@ export async function GET(
   }
 }
 
-// @desc    Update user
-// @route   PUT /api/users/:id
 export async function PUT(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    const { userId } = await auth();
-    
+    const userId = await getUserFromRequest(req);
     if (!userId) {
       return NextResponse.json({ success: false, message: 'Not authorized' }, { status: 401 });
     }
-
     const body = await req.json();
+    if (body.password) {
+      body.password = await hashPassword(body.password);
+    }
     const user = await mockDb.users.findByIdAndUpdate(id, body);
-
     if (!user) {
       return NextResponse.json({ success: false, message: 'User not found' }, { status: 404 });
     }
-
     return NextResponse.json({ success: true, data: user });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'An unknown error occurred';
@@ -56,26 +48,20 @@ export async function PUT(
   }
 }
 
-// @desc    Delete user
-// @route   DELETE /api/users/:id
 export async function DELETE(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    const { userId } = await auth();
-    
+    const userId = await getUserFromRequest(req);
     if (!userId) {
       return NextResponse.json({ success: false, message: 'Not authorized' }, { status: 401 });
     }
-
     const user = await mockDb.users.findByIdAndDelete(id);
-
     if (!user) {
       return NextResponse.json({ success: false, message: 'User not found' }, { status: 404 });
     }
-
     return NextResponse.json({ success: true, data: {} });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'An unknown error occurred';
