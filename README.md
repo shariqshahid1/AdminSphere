@@ -16,31 +16,26 @@ A modern, fully responsive admin dashboard built with Next.js, Tailwind CSS, and
 ## Project Structure
 ```
 admin-dashboard/
-└── frontend/
-    ├── app/          # pages + api routes
-    ├── components/   # reusable components
-    ├── lib/          # utils, auth, mock db
-    └── .env.local    # environment variables
+├── app/              # pages + API routes
+├── components/       # reusable UI components (Navbar, Sidebar, ThemeToggle)
+├── lib/              # utilities, auth logic, mock database
+├── .env.local        # environment variables
+└── package.json      # dependencies & scripts
 ```
 
 ## Setup
 
-1. Go to frontend folder
-   ```bash
-   cd frontend
-   ```
-
-2. Install dependencies
+1. Install dependencies
    ```bash
    npm install
    ```
 
-3. Create `.env.local` in frontend folder:
+2. Create `.env.local`:
    ```env
    JWT_SECRET=your-super-secret-jwt-key-here
    ```
 
-4. Run it
+3. Run it
    ```bash
    npm run dev
    ```
