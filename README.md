@@ -1,6 +1,6 @@
 # Admin Dashboard
 
-**Live Demo:** [https://adminsph.vercel.app](https://adminsph.vercel.app)
+**Live Demo:** [https://admin-sphere-ten.vercel.app](https://admin-sphere-ten.vercel.app)
 
 A modern, fully responsive admin dashboard built with Next.js, Tailwind CSS, and custom JWT authentication.
 
